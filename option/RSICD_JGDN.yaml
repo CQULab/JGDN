@@ -1,0 +1,94 @@
+multiscale:
+  multiscale_input_channel: 3
+  multiscale_output_channel: 1
+cross_attention:
+  att_type: "soft_att"
+seq2vec:
+  arch: skipthoughts
+  dir_st: /data/data_yl/skipthoughts
+  type: BayesianUniSkip
+  dropout: 0.25
+  fixed_emb: False
+embed:
+  embed_dim: 512
+name: AMFMN
+
+model:
+  embed-size: 512
+  text-aggregation: 'first'                  # IMPORTANT
+  image-aggregation: 'first'
+  layers: 2
+  exclude-stopwords: FalseTrue
+  shared-transformer: False           # IMPorTANT
+  dropout: 0.25
+
+
+dataset:
+  datatype: rsitmd
+  data_split:
+  data_path: 'data/rsicd_precomp/'
+  image_path: '/data/data_yl/RSICD/'
+  vocab_path: 'vocab/rsicd_splits_vocab.json'
+  batch_size: 80
+  batch_size_val: 70
+  workers: 3
+optim:
+  epochs: 70
+  lr: 0.0001
+  lr_decay_param: 0.7
+  lr_update_epoch: 20
+  grad_clip: 0
+  max_violation: 0
+  margin: 0.2
+  resume: False
+logs:
+  eval_step: 1
+  print_freq: 10
+  ckpt_save_path: "checkpoint/"
+  logger_name: 'logs/'
+k_fold:
+  experiment_name: 'rsicd_dual_SAF_a1.0'
+  nums: 1
+  current_num: 0
+
+text-model:
+  name: 'bert'
+  pretrain: 'bert-base-uncased'
+  bert-config: '/data/data_yl/modeling_bert/bert-base-uncased-config.json'
+  bert-text: '/data/data_yl/modeling_bert/bert-base-uncased-vocab.txt'
+  bert-model: '/data/data_yl/modeling_bert/bert-base-uncased-pytorch_model.bin'
+  word-dim: 768
+  extraction-hidden-layer: 6
+  fine-tune: True
+  pre-extracted: False
+  layers: 0
+  dropout: 0.1
+
+image-model:
+  name: 'bottomup'
+  #  pre-extracted-features-root: '/data/data_yl/feature_36/'   # path of pre-trained images features
+  pre-extracted-features-root: '/data/data_yl/TERAN/f30k/images/features_36/'   # path of pre-trained images features
+  transformer-layers: 4
+  dropout: 0.1
+  pos-encoding: None
+  crop-size: 224  # not used
+  fine-tune: False
+  feat-dim: 3072
+  #  feat-dim: 4096
+  norm: True
+
+training:
+  lr: 0.00001  # 0.000006
+  grad-clip: 2.0
+  max-violation: True                 # IMPORTANT
+  loss-type: 'alignment'
+  #  loss-type: 'matching'
+  alignment-mode: 'MrSw'
+  measure: 'dot'
+  margin: 0.2
+  bs: 30                       # IMPORTANT
+  scheduler: 'steplr'
+  gamma: 0.1
+  step-size: 15
+  warmup: 'linear'
+  warmup-period: 1000
